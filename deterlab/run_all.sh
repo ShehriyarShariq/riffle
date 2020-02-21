@@ -12,6 +12,8 @@ ssh dtrustee-1.lb-ldd-diss.safer.isi.deterlab.net "cd riffle/deterlab && ./run_s
 echo "Running on server 2"
 ssh dtrustee-2.lb-ldd-diss.safer.isi.deterlab.net "cd riffle/deterlab && ./run_server.sh 2 ${client}"
 
+sleep 10
+
 echo "Running on client 0 ./run_client.sh 0 ${clientpermachine}"
 ssh dclient-0.lb-ldd-diss.safer.isi.deterlab.net "cd riffle/deterlab && ./run_client.sh 0 ${clientpermachine}"
 echo "Running on client 1"
