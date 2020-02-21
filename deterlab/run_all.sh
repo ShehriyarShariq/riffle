@@ -1,9 +1,9 @@
 #!/bin/sh
 
-source killall.sh
+source ./killall.sh
 
-client=5
-clientpermachine=1
+client=100
+clientpermachine=20
 
 echo "Running on server 0  ./run_server.sh 0 ${client}"
 ssh dtrustee-0.lb-ldd-diss.safer.isi.deterlab.net "cd riffle/deterlab && ./run_server.sh 0 ${client}"
