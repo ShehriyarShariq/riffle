@@ -12,11 +12,10 @@ import (
 	"sync"
 	"time"
 
-	. "github.com/kwonalbert/riffle/lib" //types and utils
+	. "github.com/lbarman/riffle/lib" //types and utils
 
-	"github.com/dedis/kyber"
-	"github.com/dedis/kyber/cipher"
-	"github.com/dedis/kyber/group/edwards25519"
+	"go.dedis.ch/kyber"
+	"go.dedis.ch/kyber/group/edwards25519"
 
 	"golang.org/x/crypto/nacl/secretbox"
 	"golang.org/x/crypto/sha3"
@@ -67,7 +66,7 @@ type Round struct {
 }
 
 func NewClient(servers []string, myServer string, FSMode bool) *Client {
-	suite := edwards25519.NewAES128SHA256Ed25519()
+	suite := edwards25519.NewBlakeSHA256Ed25519()
 
 	myServerIdx := -1
 	rpcServers := make([]*rpc.Client, len(servers))
@@ -186,7 +185,7 @@ func (c *Client) UploadKeys(idx int) {
 	c2s := make([]kyber.Point, len(c.servers))
 
 	gen := c.g.Point().Base()
-	rand := c.suite.Cipher(cipher.RandomKey)
+	rand := c.suite.RandomStream()
 	keyPts := make([]kyber.Point, len(c.servers))
 	for i := range keyPts {
 		secret := c.g.Scalar().Pick(rand)
@@ -196,7 +195,7 @@ func (c *Client) UploadKeys(idx int) {
 	}
 
 	for i := range c.servers {
-		c1s[i], c2s[i] = EncryptKey(c.g, keyPts[i], c.pks[:i+1])
+		c1s[i], c2s[i] = EncryptKey(c.suite, c.g, keyPts[i], c.pks[:i+1])
 	}
 
 	upkey := UpKey{
@@ -224,7 +223,7 @@ func (c *Client) UploadKeys(idx int) {
 //share one time secret with the server
 func (c *Client) ShareSecret() {
 	gen := c.g.Point().Base()
-	rand := c.suite.Cipher(cipher.RandomKey)
+	rand := c.suite.RandomStream()
 	secret1 := c.g.Scalar().Pick(rand)
 	secret2 := c.g.Scalar().Pick(rand)
 	public1 := c.g.Point().Mul(secret1, gen)

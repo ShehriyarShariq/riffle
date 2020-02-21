@@ -7,6 +7,7 @@ import (
 	"crypto/sha256"
 	"errors"
 	"fmt"
+	"go.dedis.ch/kyber/group/edwards25519"
 	"io/ioutil"
 	"log"
 	"math/big"
@@ -14,8 +15,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/dedis/kyber"
-	"github.com/dedis/kyber/util/random"
+	"go.dedis.ch/kyber"
 )
 
 func SetBit(n_int int, b bool, bs []byte) {
@@ -87,7 +87,7 @@ func GeneratePI(size int) []int {
 	return pi
 }
 
-func Encrypt(g kyber.Group, msg []byte, pks []kyber.Point) ([]kyber.Point, []kyber.Point) {
+func Encrypt(suite *edwards25519.SuiteEd25519, g kyber.Group, msg []byte, pks []kyber.Point) ([]kyber.Point, []kyber.Point) {
 	c1s := []kyber.Point{}
 	c2s := []kyber.Point{}
 	msgPt := g.Point()
@@ -100,10 +100,10 @@ func Encrypt(g kyber.Group, msg []byte, pks []kyber.Point) ([]kyber.Point, []kyb
 		if end > len(msg) {
 			end = len(msg)
 		}
-		msgPt = g.Point().Embed(msg[start:end], random.Stream)
+		msgPt = g.Point().Embed(msg[start:end], suite.RandomStream())
 		i++
 
-		k := g.Scalar().Pick(random.Stream)
+		k := g.Scalar().Pick(suite.RandomStream())
 		c1 := g.Point().Mul(k, nil)
 		var c2 kyber.Point = nil
 		for _, pk := range pks {
@@ -120,8 +120,8 @@ func Encrypt(g kyber.Group, msg []byte, pks []kyber.Point) ([]kyber.Point, []kyb
 	return c1s, c2s
 }
 
-func EncryptKey(g kyber.Group, msgPt kyber.Point, pks []kyber.Point) (kyber.Point, kyber.Point) {
-	k := g.Scalar().Pick(random.Stream)
+func EncryptKey(suite *edwards25519.SuiteEd25519, g kyber.Group, msgPt kyber.Point, pks []kyber.Point) (kyber.Point, kyber.Point) {
+	k := g.Scalar().Pick(suite.RandomStream())
 	c1 := g.Point().Mul(k, nil)
 	var c2 kyber.Point = nil
 	for _, pk := range pks {
@@ -135,8 +135,8 @@ func EncryptKey(g kyber.Group, msgPt kyber.Point, pks []kyber.Point) (kyber.Poin
 	return c1, c2
 }
 
-func EncryptPoint(g kyber.Group, msgPt kyber.Point, pk kyber.Point) (kyber.Point, kyber.Point) {
-	k := g.Scalar().Pick(random.Stream)
+func EncryptPoint(suite *edwards25519.SuiteEd25519, g kyber.Group, msgPt kyber.Point, pk kyber.Point) (kyber.Point, kyber.Point) {
+	k := g.Scalar().Pick(suite.RandomStream())
 	c1 := g.Point().Mul(k, nil)
 	c2 := g.Point().Mul(k, pk)
 	c2 = c2.Add(c2, msgPt)

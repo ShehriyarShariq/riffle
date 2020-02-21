@@ -2,6 +2,7 @@
 package main
 
 import (
+	"crypto/cipher"
 	"encoding/binary"
 	"errors"
 	"flag"
@@ -16,13 +17,12 @@ import (
 
 	"time"
 
-	. "github.com/kwonalbert/riffle/lib" //types and utils
+	. "github.com/lbarman/riffle/lib" //types and utils
 
-	"github.com/dedis/kyber"
-	"github.com/dedis/kyber/cipher"
-	"github.com/dedis/kyber/group/edwards25519"
-	"github.com/dedis/kyber/proof"
-	"github.com/dedis/kyber/shuffle"
+	"go.dedis.ch/kyber"
+	"go.dedis.ch/kyber/group/edwards25519"
+	"go.dedis.ch/kyber/proof"
+	"go.dedis.ch/kyber/shuffle"
 
 	"golang.org/x/crypto/nacl/secretbox"
 	"golang.org/x/crypto/sha3"
@@ -105,8 +105,8 @@ type Round struct {
 //////////////////////////////
 
 func NewServer(port1 int, id int, servers []string, FSMode bool) *Server {
-	suite := edwards25519.NewAES128SHA256Ed25519()
-	rand := suite.Cipher(cipher.RandomKey)
+	suite := edwards25519.NewBlakeSHA256Ed25519()
+	rand := suite.RandomStream()
 	sk := suite.Scalar().Pick(rand)
 	pk := suite.Point().Mul(sk, nil)
 	pkBin := MarshalPoint(pk)
@@ -465,11 +465,11 @@ func (s *Server) shuffleKeys(_ uint64) {
 		go func(i int, pk kyber.Point) {
 			defer shuffleWG.Done()
 			//only one chunk
-			rand := s.suite.Cipher(cipher.RandomKey)
+			rand := s.suite.RandomStream()
 			var prover proof.Prover
 			var err error
 			Xbarss[i], Ybarss[i], prover = Shuffle(s.pi, s.g, nil, pk, Xss[i], Yss[i], rand)
-			prfs[i], err = proof.HashProve(s.suite, "PairShuffle", rand, prover)
+			prfs[i], err = proof.HashProve(s.suite, "PairShuffle", prover)
 			if err != nil {
 				log.Fatal("Shuffle proof failed: " + err.Error())
 			}
@@ -695,7 +695,7 @@ func (s *Server) UploadKeys(key *UpKey, _ *int) error {
 
 func (s *Server) shareSecret(clientPublic kyber.Point) (kyber.Point, kyber.Point) {
 	s.secretLock.Lock()
-	rand := s.suite.Cipher(cipher.RandomKey)
+	rand := s.suite.RandomStream()
 	gen := s.g.Point().Base()
 	secret := s.g.Scalar().Pick(rand)
 	public := s.g.Point().Mul(secret, gen)
