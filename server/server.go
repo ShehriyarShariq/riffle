@@ -644,14 +644,18 @@ func (s *Server) connectServers() {
 		for err != nil {
 			if i == s.id { //make a local rpc
 				addr := fmt.Sprintf("127.0.0.1:%d", s.port1)
+				fmt.Println("Dialing (1) ", addr)
 				rpcServer, err = rpc.Dial("tcp", addr)
 			} else {
+				fmt.Println("Dialing (1) ", s.servers[i])
 				rpcServer, err = rpc.Dial("tcp", s.servers[i])
 			}
+			time.Sleep(time.Second)
 		}
 		rpcServers[i] = rpcServer
 	}
 
+	fmt.Println("Waiting on PKs")
 	var wg sync.WaitGroup
 	for i, rpcServer := range rpcServers {
 		wg.Add(1)
@@ -666,6 +670,7 @@ func (s *Server) connectServers() {
 		}(i, rpcServer)
 	}
 	wg.Wait()
+	fmt.Println("Got the PKs")
 	for i := 0; i < len(s.servers)-s.id; i++ {
 		pk := s.pk
 		for j := 1; j <= i; j++ {
@@ -1047,6 +1052,7 @@ func main() {
 	}
 
 	ss := ParseServerList(*servers)
+	fmt.Println("Server list", ss)
 
 	TotalClients = *numClients
 
@@ -1060,9 +1066,12 @@ func main() {
 		s.memProf = f
 	}
 
+	fmt.Println("Starting rpc server")
 	rpcServer1 := rpc.NewServer()
 	rpcServer1.Register(s)
+	fmt.Println("RPC server registered")
 	l1, err := net.Listen("tcp", fmt.Sprintf(":%d", s.port1))
+	fmt.Println("listening")
 	if err != nil {
 		log.Fatal("Cannot starting listening to the port: ", err)
 	}

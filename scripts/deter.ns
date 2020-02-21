@@ -1,0 +1,41 @@
+set ns [new Simulator]
+source tb_compat.tcl
+set node0 [$ns node]
+tb-set-node-os $node0 Ubuntu1404-64-STD
+tb-set-hardware $node0 pc3060
+set node1 [$ns node]
+tb-set-node-os $node1 Ubuntu1404-64-STD
+tb-set-hardware $node1 pc3060
+set node2 [$ns node]
+tb-set-node-os $node2 Ubuntu1404-64-STD
+tb-set-hardware $node2 pc3060
+set node3 [$ns node]
+tb-set-node-os $node3 Ubuntu1404-64-STD
+tb-set-hardware $node3 pc3060
+set node4 [$ns node]
+tb-set-node-os $node4 Ubuntu1404-64-STD
+tb-set-hardware $node4 pc3060
+
+set server0 [$ns node]
+tb-set-node-os $server0 Ubuntu1404-64-STD
+tb-set-hardware $server0 d710
+set server1 [$ns node]
+tb-set-node-os $server1 Ubuntu1404-64-STD
+tb-set-hardware $server1 d710
+set server2 [$ns node]
+tb-set-node-os $server2 Ubuntu1404-64-STD
+tb-set-hardware $server2 d710
+
+set link0 [$ns duplex-link $server1 $server0 1000000kb 0ms DropTail]
+set link1 [$ns duplex-link $server2 $server0 1000000kb 0ms DropTail]
+set link2 [$ns duplex-link $server2 $server1 1000000kb 0ms DropTail]
+
+ set lan0 [$ns make-lan "$node0 $node3 $server0" 1000000kb 0ms]
+tb-set-node-lan-bandwidth $server0 $lan0 1000000kb
+ set lan1 [$ns make-lan "$node1 $node4 $server1" 1000000kb 0ms]
+tb-set-node-lan-bandwidth $server1 $lan1 1000000kb
+ set lan2 [$ns make-lan "$node2 $server2" 1000000kb 0ms]
+tb-set-node-lan-bandwidth $server2 $lan2 1000000kb
+
+$ns rtproto Static
+$ns run
