@@ -34,5 +34,5 @@ do
   sleep 90
 
   cat client0.log
-  cp client0.log out_${client}_${i}.log
+  cp client0.log out_${client}_${i}.txt
 done
