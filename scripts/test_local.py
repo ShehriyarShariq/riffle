@@ -21,8 +21,8 @@ file_dir = sys.argv[4]
 
 gopath = os.environ['GOPATH']
 
-server_cmd = "%s/bin/server -i %d -n %d -s %s/src/github.com/lbarman/riffle/servers -m %s -p1 %d"
-command = "%s/bin/client -i %d -s %s/src/github.com/lbarman/riffle/servers -m %s -w %s -f %s"
+server_cmd = "%s/bin/server -i %d -n %d -s %s/src/github.com/lbarman/riffle/servers -m m -p1 %d"
+command = "%s/bin/client -i %d -s %s/src/github.com/lbarman/riffle/servers -m m"
 
 server_file = open('%s/src/github.com/lbarman/riffle/servers' % gopath, 'w')
 for i in range(m):
@@ -35,7 +35,7 @@ def spawn(c):
 
 ss = []
 for i in range(m):
-    c = server_cmd % (gopath, i, n, gopath, mode, 8000 + i)
+    c = server_cmd % (gopath, i, n, gopath, 8000 + i)
     args = shlex.split(c)
     print "Spawning", args
     p = subprocess.Popen(args)
@@ -45,7 +45,7 @@ time.sleep(5)
 
 ts = []
 for i in range(0, n):
-    c = command % (gopath, i%m, gopath, mode, file_dir + '/file' + str(i) + '.torrent', file_dir + '/file' + str(i))
+    c = command % (gopath, i%m, gopath)
     args = shlex.split(c)
     print "Spawning", args
     p = subprocess.Popen(args)
