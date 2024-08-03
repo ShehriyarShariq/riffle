@@ -1,4 +1,4 @@
-//package client
+// package client
 package main
 
 import (
@@ -14,8 +14,8 @@ import (
 
 	. "github.com/lbarman/riffle/lib" //types and utils
 
-	"go.dedis.ch/kyber"
-	"go.dedis.ch/kyber/group/edwards25519"
+	"go.dedis.ch/kyber/v4"
+	"go.dedis.ch/kyber/v4/group/edwards25519"
 
 	"golang.org/x/crypto/nacl/secretbox"
 	"golang.org/x/crypto/sha3"

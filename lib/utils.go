@@ -7,7 +7,6 @@ import (
 	"crypto/sha256"
 	"errors"
 	"fmt"
-	"go.dedis.ch/kyber/group/edwards25519"
 	"io/ioutil"
 	"log"
 	"math/big"
@@ -15,7 +14,9 @@ import (
 	"sync"
 	"time"
 
-	"go.dedis.ch/kyber"
+	"go.dedis.ch/kyber/v4/group/edwards25519"
+
+	"go.dedis.ch/kyber/v4"
 )
 
 func SetBit(n_int int, b bool, bs []byte) {

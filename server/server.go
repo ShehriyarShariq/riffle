@@ -1,4 +1,4 @@
-//package server
+// package server
 package main
 
 import (
@@ -19,10 +19,10 @@ import (
 
 	. "github.com/lbarman/riffle/lib" //types and utils
 
-	"go.dedis.ch/kyber"
-	"go.dedis.ch/kyber/group/edwards25519"
-	"go.dedis.ch/kyber/proof"
-	"go.dedis.ch/kyber/shuffle"
+	"go.dedis.ch/kyber/v4"
+	"go.dedis.ch/kyber/v4/group/edwards25519"
+	"go.dedis.ch/kyber/v4/proof"
+	"go.dedis.ch/kyber/v4/shuffle"
 
 	"golang.org/x/crypto/nacl/secretbox"
 	"golang.org/x/crypto/sha3"
